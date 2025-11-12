@@ -1,0 +1,241 @@
+# Clean Architecture Flutter 프로젝트 규칙
+
+## 적용 범위
+이 규칙은 Clean Architecture를 기반으로 한 Flutter 프로젝트에 적용됩니다.
+Feature-first 구조를 따르며, Riverpod, Freezed, Dartz, Dio, GoRouter를 사용하는 프로젝트에 적합합니다.
+
+## 전역 규칙 사용 방법
+다른 프로젝트에서도 이 규칙을 사용하려면:
+1. **전역 규칙**: `~/.cursorrules` 파일에 복사 (모든 프로젝트에 적용)
+2. **프로젝트별 규칙**: 각 프로젝트 루트에 `.cursorrules` 파일로 복사 (현재 프로젝트에만 적용)
+3. **조건부 규칙**: 프로젝트 특정 설정은 아래 `[프로젝트별 설정]` 섹션을 참고하여 수정
+
+> **참고**: Cursor는 프로젝트 루트의 `.cursorrules`를 우선적으로 사용합니다.
+
+## 아키텍처 구조
+
+### 1. 계층 구조 (Clean Architecture)
+```
+lib/
+├── core/                    # 공통 코드 (에러, 네트워크, 라우팅 등)
+├── features/                # Feature-first 구조
+│   └── {feature_name}/
+│       ├── data/           # Data Layer
+│       │   ├── datasources/ # Remote/Local 데이터 소스
+│       │   ├── models/     # Data Transfer Objects (DTO)
+│       │   └── repositories/ # Repository 구현체
+│       ├── domain/         # Domain Layer (비즈니스 로직)
+│       │   ├── entities/   # 비즈니스 객체 (순수 Dart)
+│       │   ├── repositories/ # Repository 인터페이스
+│       │   └── usecases/   # Use Case (비즈니스 로직 단위)
+│       └── presentation/   # Presentation Layer
+│           ├── pages/      # 화면 (Page)
+│           ├── providers/  # Riverpod Providers
+│           └── widgets/   # 재사용 가능한 위젯
+```
+
+### 2. 의존성 방향 규칙
+- **Domain Layer**: 외부 의존성 없음 (순수 Dart)
+- **Data Layer**: Domain Layer에 의존
+- **Presentation Layer**: Domain Layer에 의존
+- **의존성 역전 원칙 (DIP)**: Repository는 인터페이스로 정의하고 구현체는 Data Layer에 위치
+
+## 코딩 컨벤션
+
+### 1. 파일 및 폴더 명명
+- 파일명: `snake_case` (예: `auth_remote_data_source.dart`)
+- 클래스명: `PascalCase` (예: `AuthRemoteDataSource`)
+- 변수명: `camelCase` (예: `remoteDataSource`)
+- 상수명: `lowerCamelCase` with `const` (예: `const tProductId = 1`)
+
+### 2. 클래스 명명 패턴
+- **Entity**: `{Feature}Entity` (예: `TodoEntity`, `ProductEntity`)
+- **Model**: `{Feature}Model` (예: `TodoModel`, `ProductModel`)
+- **Repository Interface**: `{Feature}Repository` (예: `TodoRepository`)
+- **Repository Implementation**: `{Feature}RepositoryImpl`
+- **Data Source**: `{Feature}RemoteDataSource` / `{Feature}LocalDataSource`
+- **Use Case**: `VerbNoun` (예: `GetAllTodos`, `LoginUser`)
+- **Provider**: `{feature}Provider`, `{feature}Controller`, `{feature}State`
+
+### 3. Freezed 사용 규칙
+- 모든 Entity와 Model은 `@freezed` 사용
+- Union types는 `Failure`처럼 `const factory`로 정의
+- `copyWith`는 자동 생성되므로 직접 구현하지 않음
+- `part` 파일은 자동 생성되므로 `.gitignore`에 포함
+
+### 4. 에러 처리 패턴
+- **Exception**: Data Layer에서만 사용 (예: `ServerException`)
+- **Failure**: Domain Layer에서 사용 (Either의 Left)
+- **변환 흐름**: `Exception` → Repository에서 `Failure`로 변환
+- **에러 처리 예시**:
+  ```dart
+  try {
+    final model = await remoteDataSource.getData();
+    return Right(model.toEntity());
+  } on ServerException catch (e) {
+    return Left(Failure.server(e.message));
+  } catch (e) {
+    return Left(Failure.general(e.toString()));
+  }
+  ```
+
+### 5. Repository 패턴
+- Repository는 **인터페이스**로 Domain Layer에 정의
+- **구현체**는 Data Layer에 위치
+- 반환 타입은 항상 `Either<Failure, T>`
+- Model을 Entity로 변환하는 `toEntity()` 메서드 사용
+
+### 6. Use Case 패턴
+- 하나의 Use Case는 하나의 비즈니스 로직만 담당
+- `UseCase<Type, Params>` 인터페이스 구현
+- Params가 여러 개인 경우 별도 클래스로 정의 (예: `GetAllTodosParams`)
+- Params가 단일 값인 경우 그대로 사용 (예: `int`, `String`)
+
+### 7. Riverpod 사용 규칙
+- **Riverpod Generator** 사용 (`@riverpod` 어노테이션)
+- Provider는 `{feature}_providers.dart` 파일에 정의
+- State는 `freezed`로 정의하여 `{feature}_state.dart`에 위치
+- Controller는 `@riverpod` class로 정의
+- Provider 파일명: `{feature}_providers.dart`, `{feature}_controller.dart`
+
+### 8. Data Source 패턴
+- Data Source는 **추상 클래스**로 정의
+- 구현체는 `Impl` 접미사 사용
+- 성공 시: 데이터 반환
+- 실패 시: `ServerException` throw
+- Dio 에러는 `_handleDioError()` 메서드로 처리
+
+### 9. Model vs Entity
+- **Model (Data Layer)**: JSON 직렬화 가능, `fromJson`, `toEntity()` 메서드 포함
+- **Entity (Domain Layer)**: 순수 비즈니스 객체, 외부 의존성 없음
+- **변환**: Model → Entity는 `toEntity()` 메서드 사용
+- **변환 시점**: Repository에서 Model을 Entity로 변환
+
+### 10. 주석 규칙
+- 한국어 주석 사용
+- 모든 public 클래스와 메서드에 문서 주석 추가
+- 복잡한 로직은 인라인 주석으로 설명
+- 예시 코드는 주석에 포함
+
+### 11. 테스트 코드 규칙
+- 테스트 파일은 `test/features/{feature}/{layer}/` 구조로 작성
+- `mocktail`을 사용하여 Mock 객체 생성
+- 테스트 데이터는 `t` 접두사 사용 (예: `tTodoModel`, `tProductId`)
+- 성공/실패 케이스 모두 테스트
+- `group()`을 사용하여 테스트 그룹화
+- Data Source, Repository, Use Case 각각 테스트
+
+### 12. Provider 구조
+```dart
+// {feature}_providers.dart
+├─ {feature}RemoteDataSource Provider
+├─ {feature}Repository Provider
+└─ UseCase Providers
+
+// {feature}_controller.dart (또는 {feature}_state.dart)
+├─ State 정의 (freezed)
+└─ Controller (AsyncNotifier)
+```
+
+### 13. 라우팅 규칙
+- GoRouter 사용 (또는 프로젝트에서 사용하는 라우팅 라이브러리)
+- 라우트는 `core/router/` 또는 `lib/router/`에 정의
+- 경로는 `/{feature}` 형식 권장
+
+### 14. API 상수 관리
+- 모든 API 엔드포인트는 `core/constants/api_constants.dart`에 정의
+- 메서드로 동적 경로 생성 권장 (예: `productById(int id)`)
+- Base URL은 환경 변수나 설정 파일로 관리
+
+### 15. HTTP 클라이언트 설정
+- Dio 인스턴스는 `core/providers/dio_provider.dart` 또는 `core/network/`에서 공통 제공
+- 각 Feature는 공통 Provider를 사용하여 HTTP 클라이언트 주입
+- Interceptor는 `core/network/`에 정의
+
+### [프로젝트별 설정]
+아래 설정은 프로젝트에 따라 변경 가능합니다:
+- 라우팅 라이브러리: GoRouter / AutoRoute / Navigator 2.0 등
+- 상태 관리: Riverpod / Provider / Bloc 등
+- HTTP 클라이언트: Dio / http / Retrofit 등
+- 로컬 저장소: SharedPreferences / Hive / Isar 등
+
+## 금지 사항
+
+1. **Domain Layer에 외부 라이브러리 import 금지**
+   - Dio, Freezed, Riverpod 등은 Domain Layer에서 사용 금지
+   - Exception 대신 Failure 사용
+
+2. **Presentation Layer에서 직접 Data Source 사용 금지**
+   - Use Case를 통해서만 데이터 접근
+
+3. **Repository 구현체를 Domain Layer에 두지 않음**
+   - Repository는 인터페이스만 Domain Layer에
+
+4. **Model을 직접 Presentation Layer에서 사용 금지**
+   - 항상 Entity로 변환 후 사용
+
+5. **하드코딩된 문자열/숫자 금지**
+   - 상수나 API Constants 사용
+
+## 코드 생성
+
+### 빌드 명령어
+```bash
+# 코드 생성 (Freezed, Riverpod Generator, JSON Serializable)
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Watch 모드 (파일 변경 시 자동 생성)
+flutter pub run build_runner watch --delete-conflicting-outputs
+```
+
+### 생성되는 파일
+- `*.freezed.dart`: Freezed 생성 파일
+- `*.g.dart`: JSON Serializable, Riverpod Generator 생성 파일
+
+## 테스트 실행
+
+```bash
+# 전체 테스트
+flutter test
+
+# 특정 feature 테스트
+flutter test test/features/{feature}/
+
+# 커버리지 확인
+flutter test --coverage
+```
+
+## 새로운 Feature 추가 시 체크리스트
+
+### 필수 단계
+1. ✅ `lib/features/{feature}/domain/entities/` - Entity 정의
+2. ✅ `lib/features/{feature}/domain/repositories/` - Repository 인터페이스 정의
+3. ✅ `lib/features/{feature}/domain/usecases/` - Use Case 정의
+4. ✅ `lib/features/{feature}/data/models/` - Model 정의 (fromJson, toEntity)
+5. ✅ `lib/features/{feature}/data/datasources/` - Data Source 정의
+6. ✅ `lib/features/{feature}/data/repositories/` - Repository 구현
+7. ✅ `lib/features/{feature}/presentation/providers/` - Provider 정의
+8. ✅ `lib/features/{feature}/presentation/pages/` - UI 페이지
+9. ✅ `test/features/{feature}/` - 테스트 코드 작성
+
+### 선택적 단계 (프로젝트에 따라)
+10. ✅ `core/constants/api_constants.dart` - API 엔드포인트 추가 (API 사용 시)
+11. ✅ 라우팅 설정 추가 (새 페이지가 있는 경우)
+12. ✅ 위젯 추가 (`presentation/widgets/` - 재사용 가능한 위젯)
+
+## 코드 작성 시 주의사항
+
+1. **의존성 주입**: Riverpod Provider를 통해 의존성 주입
+2. **불변성**: Freezed 사용으로 불변 객체 보장
+3. **에러 처리**: Either 타입으로 명시적 에러 처리
+4. **단일 책임**: Use Case는 하나의 기능만 담당
+5. **테스트 가능성**: 모든 레이어를 독립적으로 테스트 가능하도록 설계
+
+## AI 어시스턴트에게 요청할 때
+
+1. 새로운 Feature 추가 시 위의 체크리스트를 모두 포함하여 생성
+2. 코드 생성 후 `build_runner` 실행 필요 시 알림
+3. 테스트 코드 작성 시 성공/실패 케이스 모두 포함
+4. 한국어 주석 추가
+5. Clean Architecture 원칙 준수 확인
+
