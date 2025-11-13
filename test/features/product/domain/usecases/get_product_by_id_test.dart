@@ -31,7 +31,7 @@ void main() {
     usecase = GetProductById(repository);
   });
 
-  test('should call repository with id and return ProductEntity', () async {
+  test('ID로 레포지토리를 호출하면 ProductEntity를 반환한다', () async {
     when(
       () => repository.getProductById(any()),
     ).thenAnswer((_) async => const Right(tProduct));
@@ -42,7 +42,7 @@ void main() {
     verify(() => repository.getProductById(tProductId)).called(1);
   });
 
-  test('should return Failure when repository fails', () async {
+  test('레포지토리가 실패하면 Failure를 반환한다', () async {
     when(
       () => repository.getProductById(any()),
     ).thenAnswer((_) async => const Left(Failure.server('error')));

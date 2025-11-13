@@ -46,7 +46,7 @@ void main() {
   });
 
   group('getAllTodos', () {
-    test('should return List<TodoModel> when status code is 200', () async {
+    test('상태 코드가 200이면 TodoModel 목록을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTodosResponse,
         statusCode: 200,
@@ -72,7 +72,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTodosResponse,
         statusCode: 400,
@@ -89,7 +89,7 @@ void main() {
       );
     });
 
-    test('should throw ServerException on DioException', () async {
+    test('DioException이 발생하면 ServerException을 던진다', () async {
       when(
         () => dio.get(any(), queryParameters: any(named: 'queryParameters')),
       ).thenThrow(
@@ -104,7 +104,7 @@ void main() {
   });
 
   group('getTodoById', () {
-    test('should return TodoModel when status code is 200', () async {
+    test('상태 코드가 200이면 TodoModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 200,
@@ -123,7 +123,7 @@ void main() {
       verify(() => dio.get(ApiConstants.todoById(tTodoId))).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 404,
@@ -140,7 +140,7 @@ void main() {
   });
 
   group('getTodosByUserId', () {
-    test('should return List<TodoModel> when status code is 200', () async {
+    test('상태 코드가 200이면 TodoModel 목록을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTodosResponse,
         statusCode: 200,
@@ -158,7 +158,7 @@ void main() {
       verify(() => dio.get(ApiConstants.todosByUser(tUserId))).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTodosResponse,
         statusCode: 400,
@@ -175,7 +175,7 @@ void main() {
   });
 
   group('getRandomTodo', () {
-    test('should return TodoModel when status code is 200', () async {
+    test('상태 코드가 200이면 TodoModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 200,
@@ -192,7 +192,7 @@ void main() {
       verify(() => dio.get(ApiConstants.randomTodo)).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 400,
@@ -206,7 +206,7 @@ void main() {
   });
 
   group('addTodo', () {
-    test('should return TodoModel when status code is 200 or 201', () async {
+    test('상태 코드가 200 또는 201이면 TodoModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 200,
@@ -234,33 +234,30 @@ void main() {
       ).called(1);
     });
 
-    test(
-      'should throw ServerException when status code is not 200 or 201',
-      () async {
-        final response = Response<dynamic>(
-          data: tTodoJson,
-          statusCode: 400,
-          requestOptions: RequestOptions(path: ApiConstants.addTodo),
-        );
+    test('상태 코드가 200 또는 201이 아니면 ServerException을 던진다', () async {
+      final response = Response<dynamic>(
+        data: tTodoJson,
+        statusCode: 400,
+        requestOptions: RequestOptions(path: ApiConstants.addTodo),
+      );
 
-        when(
-          () => dio.post(any(), data: any(named: 'data')),
-        ).thenAnswer((_) async => response);
+      when(
+        () => dio.post(any(), data: any(named: 'data')),
+      ).thenAnswer((_) async => response);
 
-        expect(
-          () => dataSource.addTodo(
-            todo: 'Buy milk',
-            completed: false,
-            userId: tUserId,
-          ),
-          throwsA(isA<ServerException>()),
-        );
-      },
-    );
+      expect(
+        () => dataSource.addTodo(
+          todo: 'Buy milk',
+          completed: false,
+          userId: tUserId,
+        ),
+        throwsA(isA<ServerException>()),
+      );
+    });
   });
 
   group('updateTodo', () {
-    test('should return TodoModel when status code is 200', () async {
+    test('상태 코드가 200이면 TodoModel을 반환한다', () async {
       final updatedTodoJson = {
         'id': tTodoId,
         'todo': 'Buy milk and eggs',
@@ -296,7 +293,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTodoJson,
         statusCode: 400,
@@ -315,7 +312,7 @@ void main() {
   });
 
   group('deleteTodo', () {
-    test('should return void when status code is 200', () async {
+    test('상태 코드가 200이면 void를 반환한다', () async {
       final response = Response<dynamic>(
         data: {},
         statusCode: 200,
@@ -329,7 +326,7 @@ void main() {
       verify(() => dio.delete(ApiConstants.todoById(tTodoId))).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: {},
         statusCode: 400,

@@ -33,21 +33,18 @@ void main() {
     usecase = SearchProducts(repository);
   });
 
-  test(
-    'should call repository with query and return List<ProductEntity>',
-    () async {
-      when(
-        () => repository.searchProducts(any()),
-      ).thenAnswer((_) async => Right(tProducts));
+  test('검색어로 레포지토리를 호출하면 ProductEntity 목록을 반환한다', () async {
+    when(
+      () => repository.searchProducts(any()),
+    ).thenAnswer((_) async => Right(tProducts));
 
-      final result = await usecase(tQuery);
+    final result = await usecase(tQuery);
 
-      expect(result, Right(tProducts));
-      verify(() => repository.searchProducts(tQuery)).called(1);
-    },
-  );
+    expect(result, Right(tProducts));
+    verify(() => repository.searchProducts(tQuery)).called(1);
+  });
 
-  test('should return Failure when repository fails', () async {
+  test('레포지토리가 실패하면 Failure를 반환한다', () async {
     when(
       () => repository.searchProducts(any()),
     ).thenAnswer((_) async => const Left(Failure.server('error')));

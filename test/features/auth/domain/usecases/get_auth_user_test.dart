@@ -28,7 +28,7 @@ void main() {
     usecase = GetAuthUser(repository);
   });
 
-  test('should call repository with access token', () async {
+  test('액세스 토큰으로 레포지토리를 호출하면 사용자 정보를 반환한다', () async {
     when(
       () => repository.getCurrentUser(accessToken: any(named: 'accessToken')),
     ).thenAnswer((_) async => const Right(tUser));

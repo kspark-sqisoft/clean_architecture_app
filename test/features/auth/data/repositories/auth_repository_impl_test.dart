@@ -71,38 +71,35 @@ void main() {
   });
 
   group('login', () {
-    test(
-      'should return AuthSessionEntity when remote data source succeeds',
-      () async {
-        when(
-          () => remoteDataSource.login(
-            username: any(named: 'username'),
-            password: any(named: 'password'),
-            expiresInMins: any(named: 'expiresInMins'),
-          ),
-        ).thenAnswer((_) async => tAuthSessionModel);
+    test('원격 데이터 소스가 성공하면 AuthSessionEntity를 반환한다', () async {
+      when(
+        () => remoteDataSource.login(
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          expiresInMins: any(named: 'expiresInMins'),
+        ),
+      ).thenAnswer((_) async => tAuthSessionModel);
 
-        final result = await repository.login(
+      final result = await repository.login(
+        username: tUsername,
+        password: tPassword,
+        expiresInMins: tExpires,
+      );
+
+      expect(
+        result,
+        equals(const Right<Failure, AuthSessionEntity>(tAuthSessionEntity)),
+      );
+      verify(
+        () => remoteDataSource.login(
           username: tUsername,
           password: tPassword,
           expiresInMins: tExpires,
-        );
+        ),
+      ).called(1);
+    });
 
-        expect(
-          result,
-          equals(const Right<Failure, AuthSessionEntity>(tAuthSessionEntity)),
-        );
-        verify(
-          () => remoteDataSource.login(
-            username: tUsername,
-            password: tPassword,
-            expiresInMins: tExpires,
-          ),
-        ).called(1);
-      },
-    );
-
-    test('should return Failure when remote data source throws', () async {
+    test('원격 데이터 소스가 예외를 던지면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.login(
           username: any(named: 'username'),
@@ -124,7 +121,7 @@ void main() {
   });
 
   group('getCurrentUser', () {
-    test('should return AuthUserEntity when successful', () async {
+    test('성공하면 AuthUserEntity를 반환한다', () async {
       when(
         () => remoteDataSource.getCurrentUser(
           accessToken: any(named: 'accessToken'),
@@ -144,7 +141,7 @@ void main() {
   });
 
   group('refreshSession', () {
-    test('should return AuthTokensEntity when successful', () async {
+    test('성공하면 AuthTokensEntity를 반환한다', () async {
       when(
         () => remoteDataSource.refreshSession(
           refreshToken: any(named: 'refreshToken'),
@@ -169,7 +166,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.refreshSession(
           refreshToken: any(named: 'refreshToken'),

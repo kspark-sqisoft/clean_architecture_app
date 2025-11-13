@@ -62,7 +62,7 @@ void main() {
   });
 
   group('getAllProducts', () {
-    test('should return List<ProductModel> when status code is 200', () async {
+    test('상태 코드가 200이면 ProductModel 목록을 반환한다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 200,
@@ -91,7 +91,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 400,
@@ -108,7 +108,7 @@ void main() {
       );
     });
 
-    test('should throw ServerException on DioException', () async {
+    test('DioException이 발생하면 ServerException을 던진다', () async {
       when(
         () => dio.get(any(), queryParameters: any(named: 'queryParameters')),
       ).thenThrow(
@@ -126,7 +126,7 @@ void main() {
   });
 
   group('getProductById', () {
-    test('should return ProductModel when status code is 200', () async {
+    test('상태 코드가 200이면 ProductModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tProductJson,
         statusCode: 200,
@@ -146,7 +146,7 @@ void main() {
       verify(() => dio.get(ApiConstants.productById(tProductId))).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tProductJson,
         statusCode: 404,
@@ -165,7 +165,7 @@ void main() {
   });
 
   group('searchProducts', () {
-    test('should return List<ProductModel> when status code is 200', () async {
+    test('상태 코드가 200이면 ProductModel 목록을 반환한다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 200,
@@ -184,7 +184,7 @@ void main() {
       verify(() => dio.get(ApiConstants.searchProducts(tQuery))).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 400,
@@ -203,7 +203,7 @@ void main() {
   });
 
   group('getCategories', () {
-    test('should return List<String> when status code is 200', () async {
+    test('상태 코드가 200이면 문자열 목록(List<String>)을 반환한다', () async {
       final response = Response<dynamic>(
         data: tCategoriesResponse,
         statusCode: 200,
@@ -221,7 +221,7 @@ void main() {
       verify(() => dio.get(ApiConstants.productCategoryList)).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tCategoriesResponse,
         statusCode: 400,
@@ -235,7 +235,7 @@ void main() {
   });
 
   group('getProductsByCategory', () {
-    test('should return List<ProductModel> when status code is 200', () async {
+    test('상태 코드가 200이면 ProductModel 목록을 반환한다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 200,
@@ -256,7 +256,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tProductsResponse,
         statusCode: 400,

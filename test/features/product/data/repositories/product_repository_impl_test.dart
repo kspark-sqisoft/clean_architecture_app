@@ -55,35 +55,32 @@ void main() {
   });
 
   group('getAllProducts', () {
-    test(
-      'should return List<ProductEntity> when remote data source succeeds',
-      () async {
-        when(
-          () => remoteDataSource.getAllProducts(
-            limit: any(named: 'limit'),
-            skip: any(named: 'skip'),
-          ),
-        ).thenAnswer((_) async => tProductModels);
+    test('원격 데이터 소스가 성공하면 ProductEntity 목록을 반환한다', () async {
+      when(
+        () => remoteDataSource.getAllProducts(
+          limit: any(named: 'limit'),
+          skip: any(named: 'skip'),
+        ),
+      ).thenAnswer((_) async => tProductModels);
 
-        final result = await repository.getAllProducts(
-          limit: tLimit,
-          skip: tSkip,
-        );
+      final result = await repository.getAllProducts(
+        limit: tLimit,
+        skip: tSkip,
+      );
 
-        expect(result, isA<Right<Failure, List<ProductEntity>>>());
-        result.fold((failure) => fail('should not return failure'), (products) {
-          expect(products.length, 2);
-          expect(products.first.id, tProductId);
-          expect(products.first.title, 'iPhone 9');
-        });
+      expect(result, isA<Right<Failure, List<ProductEntity>>>());
+      result.fold((failure) => fail('should not return failure'), (products) {
+        expect(products.length, 2);
+        expect(products.first.id, tProductId);
+        expect(products.first.title, 'iPhone 9');
+      });
 
-        verify(
-          () => remoteDataSource.getAllProducts(limit: tLimit, skip: tSkip),
-        ).called(1);
-      },
-    );
+      verify(
+        () => remoteDataSource.getAllProducts(limit: tLimit, skip: tSkip),
+      ).called(1);
+    });
 
-    test('should return Failure when remote data source throws', () async {
+    test('원격 데이터 소스가 예외를 던지면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getAllProducts(
           limit: any(named: 'limit'),
@@ -101,7 +98,7 @@ void main() {
   });
 
   group('getProductById', () {
-    test('should return ProductEntity when successful', () async {
+    test('성공하면 ProductEntity를 반환한다', () async {
       when(
         () => remoteDataSource.getProductById(any()),
       ).thenAnswer((_) async => tProductModel);
@@ -117,7 +114,7 @@ void main() {
       verify(() => remoteDataSource.getProductById(tProductId)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getProductById(any()),
       ).thenThrow(ServerException('error'));
@@ -132,7 +129,7 @@ void main() {
   });
 
   group('searchProducts', () {
-    test('should return List<ProductEntity> when successful', () async {
+    test('성공하면 ProductEntity 목록을 반환한다', () async {
       when(
         () => remoteDataSource.searchProducts(any()),
       ).thenAnswer((_) async => tProductModels);
@@ -148,7 +145,7 @@ void main() {
       verify(() => remoteDataSource.searchProducts(tQuery)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.searchProducts(any()),
       ).thenThrow(ServerException('error'));
@@ -163,7 +160,7 @@ void main() {
   });
 
   group('getCategories', () {
-    test('should return List<String> when successful', () async {
+    test('성공하면 문자열 목록(List<String>)을 반환한다', () async {
       when(
         () => remoteDataSource.getCategories(),
       ).thenAnswer((_) async => tCategories);
@@ -179,7 +176,7 @@ void main() {
       verify(() => remoteDataSource.getCategories()).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getCategories(),
       ).thenThrow(ServerException('error'));
@@ -194,7 +191,7 @@ void main() {
   });
 
   group('getProductsByCategory', () {
-    test('should return List<ProductEntity> when successful', () async {
+    test('성공하면 ProductEntity 목록을 반환한다', () async {
       when(
         () => remoteDataSource.getProductsByCategory(any()),
       ).thenAnswer((_) async => tProductModels);
@@ -210,7 +207,7 @@ void main() {
       verify(() => remoteDataSource.getProductsByCategory(tCategory)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getProductsByCategory(any()),
       ).thenThrow(ServerException('error'));

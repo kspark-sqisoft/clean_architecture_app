@@ -59,7 +59,7 @@ void main() {
   });
 
   group('login', () {
-    test('should return AuthSessionModel when status code is 200', () async {
+    test('상태 코드가 200이면 AuthSessionModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tLoginResponse,
         statusCode: 200,
@@ -97,7 +97,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tLoginResponse,
         statusCode: 400,
@@ -118,7 +118,7 @@ void main() {
       );
     });
 
-    test('should throw ServerException on DioException', () async {
+    test('DioException이 발생하면 ServerException을 던진다', () async {
       when(
         () => dio.post(
           any(),
@@ -140,7 +140,7 @@ void main() {
   });
 
   group('getCurrentUser', () {
-    test('should return AuthUserModel when status code is 200', () async {
+    test('상태 코드가 200이면 AuthUserModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tUserResponse,
         statusCode: 200,
@@ -161,7 +161,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tUserResponse,
         statusCode: 401,
@@ -180,7 +180,7 @@ void main() {
   });
 
   group('refreshSession', () {
-    test('should return AuthTokensModel when status code is 200', () async {
+    test('상태 코드가 200이면 AuthTokensModel을 반환한다', () async {
       final response = Response<dynamic>(
         data: tTokensResponse,
         statusCode: 200,
@@ -212,7 +212,7 @@ void main() {
       ).called(1);
     });
 
-    test('should throw ServerException when status code is not 200', () async {
+    test('상태 코드가 200이 아니면 ServerException을 던진다', () async {
       final response = Response<dynamic>(
         data: tTokensResponse,
         statusCode: 400,

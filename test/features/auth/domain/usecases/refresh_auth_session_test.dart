@@ -23,7 +23,7 @@ void main() {
     usecase = RefreshAuthSession(repository);
   });
 
-  test('should call repository with refresh token', () async {
+  test('리프레시 토큰으로 레포지토리를 호출하면 새 토큰을 반환한다', () async {
     when(
       () => repository.refreshSession(
         refreshToken: any(named: 'refreshToken'),

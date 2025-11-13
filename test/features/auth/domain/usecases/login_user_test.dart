@@ -37,7 +37,7 @@ void main() {
     usecase = LoginUser(repository);
   });
 
-  test('should call repository and return AuthSessionEntity', () async {
+  test('레포지토리를 호출하면 AuthSessionEntity를 반환한다', () async {
     when(
       () => repository.login(
         username: any(named: 'username'),

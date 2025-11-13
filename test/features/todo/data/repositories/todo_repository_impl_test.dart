@@ -38,32 +38,29 @@ void main() {
   });
 
   group('getAllTodos', () {
-    test(
-      'should return List<TodoEntity> when remote data source succeeds',
-      () async {
-        when(
-          () => remoteDataSource.getAllTodos(
-            limit: any(named: 'limit'),
-            skip: any(named: 'skip'),
-          ),
-        ).thenAnswer((_) async => tTodoModels);
+    test('원격 데이터 소스가 성공하면 TodoEntity 목록을 반환한다', () async {
+      when(
+        () => remoteDataSource.getAllTodos(
+          limit: any(named: 'limit'),
+          skip: any(named: 'skip'),
+        ),
+      ).thenAnswer((_) async => tTodoModels);
 
-        final result = await repository.getAllTodos(limit: tLimit, skip: tSkip);
+      final result = await repository.getAllTodos(limit: tLimit, skip: tSkip);
 
-        expect(result, isA<Right<Failure, List<TodoEntity>>>());
-        result.fold((failure) => fail('should not return failure'), (todos) {
-          expect(todos.length, 2);
-          expect(todos.first.id, tTodoId);
-          expect(todos.first.todo, 'Buy milk');
-        });
+      expect(result, isA<Right<Failure, List<TodoEntity>>>());
+      result.fold((failure) => fail('should not return failure'), (todos) {
+        expect(todos.length, 2);
+        expect(todos.first.id, tTodoId);
+        expect(todos.first.todo, 'Buy milk');
+      });
 
-        verify(
-          () => remoteDataSource.getAllTodos(limit: tLimit, skip: tSkip),
-        ).called(1);
-      },
-    );
+      verify(
+        () => remoteDataSource.getAllTodos(limit: tLimit, skip: tSkip),
+      ).called(1);
+    });
 
-    test('should return Failure when remote data source throws', () async {
+    test('원격 데이터 소스가 예외를 던지면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getAllTodos(
           limit: any(named: 'limit'),
@@ -81,7 +78,7 @@ void main() {
   });
 
   group('getTodoById', () {
-    test('should return TodoEntity when successful', () async {
+    test('성공하면 TodoEntity를 반환한다', () async {
       when(
         () => remoteDataSource.getTodoById(any()),
       ).thenAnswer((_) async => tTodoModel);
@@ -97,7 +94,7 @@ void main() {
       verify(() => remoteDataSource.getTodoById(tTodoId)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getTodoById(any()),
       ).thenThrow(ServerException('error'));
@@ -109,7 +106,7 @@ void main() {
   });
 
   group('getTodosByUserId', () {
-    test('should return List<TodoEntity> when successful', () async {
+    test('성공하면 TodoEntity 목록을 반환한다', () async {
       when(
         () => remoteDataSource.getTodosByUserId(any()),
       ).thenAnswer((_) async => tTodoModels);
@@ -125,7 +122,7 @@ void main() {
       verify(() => remoteDataSource.getTodosByUserId(tUserId)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getTodosByUserId(any()),
       ).thenThrow(ServerException('error'));
@@ -140,7 +137,7 @@ void main() {
   });
 
   group('getRandomTodo', () {
-    test('should return TodoEntity when successful', () async {
+    test('성공하면 TodoEntity를 반환한다', () async {
       when(
         () => remoteDataSource.getRandomTodo(),
       ).thenAnswer((_) async => tTodoModel);
@@ -156,7 +153,7 @@ void main() {
       verify(() => remoteDataSource.getRandomTodo()).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.getRandomTodo(),
       ).thenThrow(ServerException('error'));
@@ -168,7 +165,7 @@ void main() {
   });
 
   group('addTodo', () {
-    test('should return TodoEntity when successful', () async {
+    test('성공하면 TodoEntity를 반환한다', () async {
       when(
         () => remoteDataSource.addTodo(
           todo: any(named: 'todo'),
@@ -198,7 +195,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.addTodo(
           todo: any(named: 'todo'),
@@ -218,7 +215,7 @@ void main() {
   });
 
   group('updateTodo', () {
-    test('should return TodoEntity when successful', () async {
+    test('성공하면 TodoEntity를 반환한다', () async {
       final updatedTodoModel = TodoModel(
         id: tTodoId,
         todo: 'Buy milk and eggs',
@@ -255,7 +252,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.updateTodo(
           id: any(named: 'id'),
@@ -271,7 +268,7 @@ void main() {
   });
 
   group('deleteTodo', () {
-    test('should return void when successful', () async {
+    test('성공하면 void를 반환한다', () async {
       when(
         () => remoteDataSource.deleteTodo(any()),
       ).thenAnswer((_) async => Future.value());
@@ -282,7 +279,7 @@ void main() {
       verify(() => remoteDataSource.deleteTodo(tTodoId)).called(1);
     });
 
-    test('should return Failure when remote throws ServerException', () async {
+    test('원격 호출에서 ServerException이 발생하면 Failure를 반환한다', () async {
       when(
         () => remoteDataSource.deleteTodo(any()),
       ).thenThrow(ServerException('error'));

@@ -44,7 +44,7 @@ void main() {
     usecase = GetAllProducts(repository);
   });
 
-  test('should call repository and return List<ProductEntity>', () async {
+  test('레포지토리를 호출하면 ProductEntity 목록을 반환한다', () async {
     when(
       () => repository.getAllProducts(
         limit: any(named: 'limit'),
@@ -61,7 +61,7 @@ void main() {
     ).called(1);
   });
 
-  test('should return Failure when repository fails', () async {
+  test('레포지토리가 실패하면 Failure를 반환한다', () async {
     when(
       () => repository.getAllProducts(
         limit: any(named: 'limit'),
